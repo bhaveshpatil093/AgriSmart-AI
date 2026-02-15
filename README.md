@@ -146,9 +146,6 @@ AgriSmart-AI/
 - ✅ Offline-first architecture
 
 ### Upcoming
-- 🔄 AI-powered crop disease detection
-- 🔄 Historical price trend analysis
-- 🔄 SMS alert integration
 - 🔄 Buyer-farmer marketplace
 - 🔄 Mobile app (React Native)
 
@@ -163,11 +160,6 @@ Email: bhaveshpatiltech@gmail.com
 **Ajinkya Wagh** - Frontend Developer & Communications  
 GitHub: [@Ajinkyawagh4846](https://github.com/Ajinkyawagh4846)  
 Email: ajinkyawagh2005@gmail.com
-
-**Shivani Pawar** - Research & Analysis
-
-**Vaibhav Upadhyay** - UI/UX Designer & Hardware Developer
-
 ---
 
 ## 📞 Contact
