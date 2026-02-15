@@ -35,6 +35,11 @@ import ImpactAssessment from './components/ImpactAssessment';
 import OnboardingFlow from './components/OnboardingFlow';
 import UserProfile from './components/UserProfile';
 import LandingPage from './components/LandingPage';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
+import PriceHistory from './components/PriceHistory';
+import EnhancedWeather from './components/EnhancedWeather';
+import CropCalendar from './components/CropCalendar';
 import NotificationCenter from './components/NotificationCenter';
 import ConnectivityBanner from './components/ConnectivityBanner';
 import OfflineSettings from './components/OfflineSettings';
@@ -48,11 +53,13 @@ import QADashboard from './components/QADashboard';
 import { AppView, User, UserRole } from './types';
 import { NotificationApi } from './api/notifications/service';
 import { AnalyticsApi } from './api/analytics/service';
+import { i18n } from './utils/i18n';
 
 const AppContent: React.FC = () => {
   const { user, setUser, isLoading: authLoading } = useAuth();
   const [currentView, setCurrentView] = useState<AppView>(AppView.DASHBOARD);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showAuth, setShowAuth] = useState<'login' | 'signup' | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -85,6 +92,26 @@ const AppContent: React.FC = () => {
     if (window.lucide) window.lucide.createIcons();
   }, [currentView, user, authLoading, isSidebarCollapsed, isNotificationsOpen, showOnboarding]);
 
+  // Rehydrate user from localStorage on app init
+  useEffect(() => {
+    try {
+      console.log('[App] init: checking localStorage for agri_smart_user');
+      const saved = localStorage.getItem('agri_smart_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('[App] init: found saved user, setting user and navigating to dashboard', parsed);
+        setUser(parsed);
+        setCurrentView(AppView.DASHBOARD);
+      }
+    } catch (err) {
+      console.error('[App] error reading agri_smart_user from localStorage', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('[App] view changed ->', currentView);
+  }, [currentView]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
@@ -94,21 +121,64 @@ const AppContent: React.FC = () => {
     );
   }
 
-  if (!user && !showOnboarding) {
-    return <LandingPage onGetStarted={() => setShowOnboarding(true)} onLogin={() => setShowOnboarding(true)} />;
+  if (!user && !showOnboarding && !showAuth) {
+    return <LandingPage 
+      onGetStarted={() => setShowAuth('signup')} 
+      onLogin={() => setShowAuth('login')} 
+    />;
+  }
+
+  if (!user && showAuth) {
+    if (showAuth === 'login') {
+      return <Login 
+        onSwitchToSignup={() => setShowAuth('signup')} 
+        onSuccess={() => {
+          setShowAuth(null);
+          // User will be set by auth context
+        }}
+      />;
+    }
+    return <Signup 
+      onSwitchToLogin={() => setShowAuth('login')} 
+      onSuccess={() => {
+        setShowAuth(null);
+        // User will be set by auth context
+      }}
+    />;
   }
 
   if (!user && showOnboarding) {
     return <OnboardingFlow onComplete={(u) => {
-      setUser(u);
-      setShowOnboarding(false);
-      localStorage.setItem('agri_smart_token', 'mock_token');
+      try {
+        console.log('[App] OnboardingFlow onComplete called with user:', u);
+        // Persist the full user object to localStorage
+        localStorage.setItem('agri_smart_user', JSON.stringify(u));
+        // Keep any existing token behavior if needed
+        localStorage.setItem('agri_smart_token', 'mock_token');
+        console.log('[App] User saved to localStorage:', u);
+        
+        // Set user in context first
+        setUser(u);
+        console.log('[App] User set in context');
+        
+        // Set language from user preference
+        if (u.language) {
+          i18n.setLanguage(u.language);
+        }
+        
+        // Close onboarding and navigate to dashboard
+        setShowOnboarding(false);
+        setCurrentView(AppView.DASHBOARD);
+        console.log('[App] Navigated to dashboard, currentView:', AppView.DASHBOARD);
+      } catch (err) {
+        console.error('[App] error handling onboarding completion', err);
+      }
     }} />;
   }
 
   const renderView = () => {
     switch (currentView) {
-      case AppView.DASHBOARD: return <Dashboard />;
+      case AppView.DASHBOARD: return <Dashboard setView={setCurrentView} user={user} />;
       case AppView.CROP_MANAGEMENT: return <CropManagement />;
       case AppView.GRAPE_ADVISORY: return <GrapeAdvisor />;
       case AppView.ONION_ADVISORY: return <OnionAdvisor />;
@@ -133,8 +203,13 @@ const AppContent: React.FC = () => {
       case AppView.PREDICTION: return <RainfallForecaster />;
       case AppView.IRRIGATION: return <IrrigationManager />;
       case AppView.IMPACT: return <ImpactAssessment />;
+      case AppView.PRICE_HISTORY: return <PriceHistory />;
+      case AppView.ENHANCED_WEATHER: return <EnhancedWeather location={user?.location.village} />;
+      case AppView.CROP_CALENDAR: return <CropCalendar />;
       case AppView.PROFILE: return <UserProfile user={user!} onUpdate={setUser} setView={setCurrentView} />;
       case AppView.OFFLINE_SETTINGS: return <OfflineSettings />;
+      case AppView.LOGIN: return <Login onSwitchToSignup={() => setCurrentView(AppView.SIGNUP)} onSuccess={() => setCurrentView(AppView.DASHBOARD)} />;
+      case AppView.SIGNUP: return <Signup onSwitchToLogin={() => setCurrentView(AppView.LOGIN)} onSuccess={() => setCurrentView(AppView.DASHBOARD)} />;
 
       case AppView.NOTIFICATION_SETTINGS: return <NotificationPreferences />;
       case AppView.NOTIFICATION_DASHBOARD: return <NotificationDashboard />;

@@ -32,9 +32,16 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView }) => {
     {
       section: 'Market & Finance', items: [
         { id: AppView.PRICE_ANALYTICS, label: 'Trends', icon: 'line-chart', color: 'text-amber-600', bg: 'bg-amber-50' },
+        { id: AppView.PRICE_HISTORY, label: 'Price History', icon: 'history', color: 'text-emerald-600', bg: 'bg-emerald-50' },
         { id: AppView.PRICE_FORECAST, label: 'Forecast', icon: 'trending-up', color: 'text-indigo-600', bg: 'bg-indigo-50' },
         { id: AppView.HARVEST_OPTIMIZER, label: 'Harvest', icon: 'scissors', color: 'text-orange-600', bg: 'bg-orange-50' },
         { id: AppView.GOVT_SCHEMES, label: 'Schemes', icon: 'scroll', color: 'text-yellow-600', bg: 'bg-yellow-50' },
+      ]
+    },
+    {
+      section: 'Planning & Weather', items: [
+        { id: AppView.CROP_CALENDAR, label: 'Calendar', icon: 'calendar', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        { id: AppView.ENHANCED_WEATHER, label: 'Weather', icon: 'cloud', color: 'text-blue-600', bg: 'bg-blue-50' },
       ]
     },
     {

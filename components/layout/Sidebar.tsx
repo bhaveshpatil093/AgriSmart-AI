@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppView } from '../../types';
+import { i18n, Language } from '../../utils/i18n';
 
 interface SidebarProps {
   currentView: AppView;
@@ -9,30 +10,46 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isCollapsed, toggleCollapsed }) => {
+  const [currentLang, setCurrentLang] = useState<Language>(i18n.getLanguage());
+
+  useEffect(() => {
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLang(e.detail);
+    };
+    window.addEventListener('languageChanged', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
+  }, []);
+
+  useEffect(() => {
+    // @ts-ignore
+    if (window.lucide) window.lucide.createIcons();
+  }, [currentLang]);
+
   const navigation = [
     {
       section: 'Overview', items: [
-        { id: AppView.DASHBOARD, label: 'Dashboard', icon: 'layout-dashboard' },
+        { id: AppView.DASHBOARD, label: i18n.translate('nav.dashboard'), icon: 'layout-dashboard' },
       ]
     },
     {
       section: 'Communication', items: [
-        { id: AppView.VOICE_ADVISOR, label: 'Voice Help', icon: 'mic-2' },
+        { id: AppView.VOICE_ADVISOR, label: i18n.translate('nav.voice'), icon: 'mic-2' },
         { id: AppView.COMMUNITY, label: 'Commons', icon: 'users' },
         { id: AppView.EXPERT_HUB, label: 'Specialist', icon: 'graduation-cap' },
       ]
     },
     {
       section: 'Intelligence', items: [
-        { id: AppView.MARKET_INTELLIGENCE, label: 'Markets', icon: 'bar-chart-3' },
+        { id: AppView.MARKET_INTELLIGENCE, label: i18n.translate('nav.markets'), icon: 'bar-chart-3' },
         { id: AppView.PRICE_ANALYTICS, label: 'Trends', icon: 'line-chart' },
+        { id: AppView.PRICE_HISTORY, label: 'Price History', icon: 'history' },
         { id: AppView.SUCCESS_STORIES, label: 'Stories', icon: 'award' },
         { id: AppView.GOVT_SCHEMES, label: 'Schemes', icon: 'scroll' },
       ]
     },
     {
       section: 'Farm Management', items: [
-        { id: AppView.CROP_MANAGEMENT, label: 'My Crops', icon: 'leaf' },
+        { id: AppView.CROP_MANAGEMENT, label: i18n.translate('nav.myCrops'), icon: 'leaf' },
         { id: AppView.IPM_SCHEDULER, label: 'IPM', icon: 'shield-check' },
         { id: AppView.IRRIGATION, label: 'Water', icon: 'droplet' },
         { id: AppView.NUTRIENT_PLANNER, label: 'Nutrients', icon: 'flask-conical' },
@@ -42,7 +59,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isCollapsed, to
       section: 'Analysis Tools', items: [
         { id: AppView.CROP_SCANNER, label: 'Scanner', icon: 'camera' },
         { id: AppView.CLIMATE_INSIGHTS, label: 'Resilience', icon: 'trending-up' },
-        { id: AppView.IMPACT, label: 'Impact', icon: 'alert-octagon' },
+        { id: AppView.ENHANCED_WEATHER, label: 'Weather', icon: 'cloud' },
+        { id: AppView.IMPACT, label: i18n.translate('nav.impact'), icon: 'alert-octagon' },
+      ]
+    },
+    {
+      section: 'Planning', items: [
+        { id: AppView.CROP_CALENDAR, label: 'Crop Calendar', icon: 'calendar' },
       ]
     },
     {

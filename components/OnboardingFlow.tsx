@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, UserRole, SoilType } from '../types';
+import { i18n, Language } from '../utils/i18n';
 
 interface OnboardingFlowProps {
   onComplete: (user: User) => void;
@@ -10,28 +11,28 @@ const NASHIK_TALUKAS = [
 ];
 
 const CROP_DATA = [
-  { 
-    id: 'Grape', 
-    label: 'Grapes', 
-    icon: 'grape', 
+  {
+    id: 'Grape',
+    label: 'Grapes',
+    icon: 'grape',
     color: 'bg-purple-50 text-purple-600', 
-    varieties: ['Thompson Seedless', 'Sharad Seedless', 'Manik Chaman', 'Jumbo Purple'],
+    varieties: ['Thompson', 'Crimson', 'Anushka', 'Sonaka', 'Super Sonaka', 'RK', 'RR35', 'Sudhakar', 'Jumbo Seedless', 'Black Sonaka', 'Sharad Seedless'],
     desc: 'Export quality viticulture.'
   },
-  { 
-    id: 'Onion', 
-    label: 'Onions', 
-    icon: 'sprout', 
-    color: 'bg-amber-50 text-amber-600', 
-    varieties: ['Bhima Super', 'Bhima Red', 'Agrifound Dark Red', 'N-2-4-1'],
+  {
+    id: 'Onion',
+    label: 'Onions',
+    icon: 'sprout',
+    color: 'bg-amber-50 text-amber-600',
+    varieties: ['Puna Fursungi', 'Panchganga', 'Kisan Gulabi', 'Chavhan Beej', 'Red Force', 'Prasad Gulabi'],
     desc: 'High-yield Kharif/Rabi.'
   },
-  { 
-    id: 'Tomato', 
-    label: 'Tomatoes', 
+  {
+    id: 'Tomato',
+    label: 'Tomatoes',
     icon: 'cherry', 
-    color: 'bg-rose-50 text-rose-600', 
-    varieties: ['Abhinav Hybrid', 'SH-20', 'Pusa Ruby', 'Local Selection'],
+    color: 'bg-rose-50 text-rose-600',
+    varieties: ['Sai 22', 'Viran', 'Ajitesh', '6242', '1057', 'Atharv', 'Aryaman', 'Ansal', 'Mahindra 575', 'Veer'],
     desc: 'Disease-resistant hybrids.'
   }
 ];
@@ -47,30 +48,57 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     language: 'en',
     role: UserRole.FARMER,
     location: { village: '', ward: '' },
-    farmDetails: { 
-      crops: [], 
-      size: 0, 
+    farmDetails: {
+      crops: [],
+      size: 0,
       irrigation: 'drip',
       soilType: 'Black'
     },
     preferences: { 
-      notifications: true, 
+      notifications: true,
       notificationChannels: { push: true, sms: true, voice: false },
       alertThresholds: { critical: true, warning: true, advisory: true },
       quietHours: { enabled: false, start: "22:00", end: "06:00" },
       categorySettings: { weather: true, market: true, community: true, advisory: true },
-      units: 'metric' 
+      units: 'metric'
     },
     unit: 'acre'
   });
 
   const [selectedCropId, setSelectedCropId] = useState<string | null>(null);
   const [selectedVariety, setSelectedVariety] = useState<string>('');
+  const [selectedVarieties, setSelectedVarieties] = useState<string[]>([]);
+  const [varietySearch, setVarietySearch] = useState<string>('');
+  const [showVarietyDropdown, setShowVarietyDropdown] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    CROP_DATA.forEach(c => (init[c.id] = false));
+    return init;
+  });
+  const [sectionSearch, setSectionSearch] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    CROP_DATA.forEach(c => (init[c.id] = ''));
+    return init;
+  });
 
   useEffect(() => {
     // @ts-ignore
     if (window.lucide) window.lucide.createIcons();
-  }, [step, loading, locationStatus, formData, selectedCropId]);
+  }, [step, loading, locationStatus, formData, selectedCropId, selectedVarieties, showVarietyDropdown]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.variety-dropdown-container')) {
+        setShowVarietyDropdown(false);
+      }
+    };
+    if (showVarietyDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showVarietyDropdown]);
 
   const handleNext = () => setStep(s => s + 1);
   const handleBack = () => setStep(s => s - 1);
@@ -95,8 +123,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   };
 
   const finalize = () => {
-    const finalSize = sizeUnit === 'hectare' ? (formData.farmDetails?.size || 0) * 2.471 : (formData.farmDetails?.size || 0);
-    
+    const finalSize = sizeUnit === 'hectare' ? (formData.farmDetails?.size || 0) * 2.471 : (formData.farmDetails?.size || 0);   
+
     const finalUser: User = {
       userId: 'u' + Math.random().toString(36).substr(2, 5),
       name: formData.name || 'Agri User',
@@ -106,6 +134,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       location: formData.location || { village: 'Nashik', ward: 'District' },
       farmDetails: {
         crops: selectedCropId ? [selectedCropId] : [],
+        cropVarieties: selectedVarieties,
         size: finalSize,
         irrigation: formData.farmDetails?.irrigation || 'drip',
         soilType: formData.farmDetails?.soilType || 'Black'
@@ -113,7 +142,41 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       preferences: formData.preferences as User['preferences'],
       createdAt: new Date().toISOString()
     };
-    onComplete(finalUser);
+    try {
+      console.log('[OnboardingFlow] finalize - calling onComplete with user:', finalUser);
+      onComplete(finalUser);
+    } catch (err) {
+      console.error('[OnboardingFlow] error in finalize/onComplete', err);
+    }
+  };
+
+  const toggleVariety = (variety: string) => {
+    setSelectedVarieties(prev => {
+      const next = prev.includes(variety) ? prev.filter(v => v !== variety) : [...prev, variety];
+      console.log('[OnboardingFlow] toggleVariety ->', variety, 'next selection:', next);
+      return next;
+    });
+  };
+
+  const getFilteredVarieties = () => {
+    if (!selectedCropId) return [];
+    const crop = CROP_DATA.find(c => c.id === selectedCropId);
+    if (!crop) return [];
+    if (!varietySearch) return crop.varieties;
+    return crop.varieties.filter(v =>
+      v.toLowerCase().includes(varietySearch.toLowerCase())
+    );
+  };
+
+  const getVarietiesByCrop = () => {
+    // Group all varieties by crop type for display
+    return CROP_DATA.map(crop => ({
+      cropId: crop.id,
+      cropLabel: crop.label,
+      varieties: varietySearch
+        ? crop.varieties.filter(v => v.toLowerCase().includes(varietySearch.toLowerCase()))
+        : crop.varieties
+    })).filter(group => group.varieties.length > 0);
   };
 
   const renderStep = () => {
@@ -125,7 +188,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-[15px] flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <i data-lucide="sprout" className="w-8 h-8"></i>
               </div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Welcome to AgriSmart</h2>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{i18n.translate('onboarding.welcome')}</h2>     
               <p className="text-sm text-slate-500 font-medium max-w-xs mx-auto">Digitizing climate resilience for Nashik farmers.</p>
             </div>
 
@@ -147,7 +210,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               ))}
             </div>
 
-            <button 
+            <button
               onClick={handleNext}
               className="w-full py-4 bg-emerald-600 text-white rounded-[15px] font-bold text-base shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-[0.98] transition-all"
             >
@@ -160,19 +223,22 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-1">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Language Preference</h2>
-              <p className="text-sm text-slate-500 font-medium">Select for advice and critical alerts.</p>
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">{i18n.translate('onboarding.languagePreference')}</h2>
+              <p className="text-sm text-slate-500 font-medium">{i18n.translate('onboarding.selectLanguage')}</p>
             </div>
-            
+
             <div className="grid grid-cols-1 gap-3">
               {[
                 { id: 'mr', label: 'मराठी', sub: 'Marathi', flag: '🇮🇳' },
                 { id: 'hi', label: 'हिन्दी', sub: 'Hindi', flag: '🇮🇳' },
-                { id: 'en', label: 'English', sub: 'Global', flag: '🌍' }
+                { id: 'en', label: 'English', sub: 'Global', flag: '🌐' }
               ].map(lang => (
                 <button
                   key={lang.id}
-                  onClick={() => setFormData({ ...formData, language: lang.id as any })}
+                  onClick={() => {
+                    setFormData({ ...formData, language: lang.id as any });
+                    i18n.setLanguage(lang.id as Language);
+                  }}
                   className={`flex items-center justify-between p-5 border rounded-[15px] text-left transition-all group ${formData.language === lang.id ? 'border-emerald-600 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}
                 >
                   <div className="flex items-center space-x-4">
@@ -190,14 +256,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             </div>
 
             <div className="flex flex-col space-y-3 pt-4">
-              <button 
+              <button
                 onClick={handleNext}
                 disabled={!formData.language}
                 className="w-full py-4 bg-emerald-600 text-white rounded-[15px] font-bold text-base shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:bg-slate-200"
               >
-                Continue
+                {i18n.translate('common.continue')}
               </button>
-              <button onClick={handleBack} className="w-full py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">Go Back</button>
+              <button onClick={handleBack} className="w-full py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">{i18n.translate('common.back')}</button>
             </div>
           </div>
         );
@@ -210,7 +276,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               <p className="text-sm text-slate-500 font-medium">Used for ward-level climate tracking.</p>
             </div>
 
-            <button 
+            <button
               onClick={detectLocation}
               className={`w-full p-6 rounded-[15px] border-2 border-dashed transition-all flex flex-col items-center justify-center space-y-2 ${locationStatus === 'detecting' ? 'bg-blue-50 border-blue-200' : locationStatus === 'success' ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200 hover:border-blue-400'}`}
             >
@@ -232,11 +298,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
 
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Taluka (Block)</label>
-                <select 
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Taluka (Block)</label>  
+                <select
                   className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[15px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500"
                   value={formData.location?.ward || ''}
-                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, ward: e.target.value } })}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, ward: e.target.value } })}     
                 >
                   <option value="">Select Taluka</option>
                   {NASHIK_TALUKAS.map(t => <option key={t} value={t}>{t}</option>)}
@@ -244,18 +310,18 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Village Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="e.g. Ozar"
                   className="w-full p-4 bg-slate-50 border border-slate-100 rounded-[15px] font-bold text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500"
                   value={formData.location?.village || ''}
-                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, village: e.target.value } })}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, village: e.target.value } })}  
                 />
               </div>
             </div>
 
             <div className="flex flex-col space-y-3 pt-4">
-              <button 
+              <button
                 onClick={handleNext}
                 disabled={!formData.location?.village}
                 className="w-full py-4 bg-emerald-600 text-white rounded-[15px] font-bold text-base shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-[0.98] transition-all disabled:bg-slate-200"
@@ -271,8 +337,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="space-y-1">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Farm Profile</h2>
-              <p className="text-sm text-slate-500 font-medium">Select your primary cultivation focus.</p>
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">{i18n.translate('onboarding.farmProfile')}</h2>  
+              <p className="text-sm text-slate-500 font-medium">{i18n.translate('onboarding.selectCrop')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -282,6 +348,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
                   onClick={() => {
                     setSelectedCropId(crop.id);
                     setSelectedVariety(crop.varieties[0]);
+                    setSelectedVarieties([]);
+                    setVarietySearch('');
+                    setShowVarietyDropdown(false);
                   }}
                   className={`p-4 rounded-[15px] border text-left transition-all relative group ${selectedCropId === crop.id ? 'border-emerald-600 bg-emerald-50/50 ring-1 ring-emerald-600' : 'border-slate-100 hover:border-slate-200 bg-white'}`}
                 >
@@ -294,59 +363,164 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               ))}
             </div>
 
-            {selectedCropId && (
-              <div className="space-y-4 animate-slide-up bg-slate-50 p-5 rounded-[15px] border border-slate-100">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Variety</label>
-                  <select 
-                    className="w-full p-3 bg-white border border-slate-100 rounded-[15px] font-bold text-slate-700 outline-none"
-                    value={selectedVariety}
-                    onChange={(e) => setSelectedVariety(e.target.value)}
-                  >
-                    {CROP_DATA.find(c => c.id === selectedCropId)?.varieties.map(v => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
+            <div className="space-y-4 animate-slide-up bg-slate-50 p-5 rounded-[15px] border border-slate-100">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{i18n.translate('onboarding.selectVarieties')}</label>
+                {/* Collapsible crop sections - one per crop */}
+                <div className="space-y-3">
+                  {CROP_DATA.map(crop => {
+                    const isExpanded = !!expanded?.[crop.id];
+                    const searchVal = (sectionSearch[crop.id] || '').toLowerCase();
+                    const filtered = crop.varieties.filter(v => v.toLowerCase().includes(searchVal));
+                    const selectedCount = crop.varieties.filter(v => selectedVarieties.includes(v)).length;
+                    return (
+                      <div key={crop.id} className={`rounded-[15px] overflow-hidden border-2 transition-all ${isExpanded ? 'border-slate-200 shadow-md' : 'border-slate-100'}`}>
+                        <button
+                          type="button"
+                          onClick={() => setExpanded(prev => ({ ...prev, [crop.id]: !prev[crop.id] }))}
+                          className={`w-full flex items-center justify-between px-4 py-3.5 ${crop.color} rounded-[15px] transition-all hover:opacity-90`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 bg-white/50 rounded-[12px] flex items-center justify-center`}>
+                              <i data-lucide={crop.icon} className="w-5 h-5"></i>
+                            </div>
+                            <div>
+                              <div className="font-black text-base">{crop.label.toUpperCase()}</div>
+                              {selectedCount > 0 && (
+                                <div className="text-[10px] font-bold opacity-75">{selectedCount} selected</div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {selectedCount > 0 && (
+                              <div className="w-6 h-6 bg-white/50 rounded-full flex items-center justify-center text-xs font-black">
+                                {selectedCount}
+                              </div>
+                            )}
+                            <i data-lucide={isExpanded ? 'chevron-up' : 'chevron-down'} className="w-5 h-5"></i>
+                          </div>
+                        </button>
+
+                        <div 
+                          className={`transition-all duration-300 ease-in-out overflow-hidden bg-white`}
+                          style={{ 
+                            maxHeight: isExpanded ? '500px' : '0',
+                            opacity: isExpanded ? 1 : 0
+                          }}
+                        >
+                          <div className="p-4 space-y-3">
+                            <input
+                              type="search"
+                              placeholder={`Search ${crop.label} varieties...`}
+                              value={sectionSearch[crop.id] || ''}
+                              onChange={(e) => setSectionSearch(prev => ({ ...prev, [crop.id]: e.target.value }))}
+                              className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            />
+
+                            <div className="max-h-64 overflow-y-auto space-y-1.5 pr-1">
+                              {filtered.map(v => {
+                                const isSelected = selectedVarieties.includes(v);
+                                return (
+                                  <label 
+                                    key={v} 
+                                    className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all ${
+                                      isSelected 
+                                        ? 'bg-emerald-50 border-2 border-emerald-200' 
+                                        : 'hover:bg-slate-50 border-2 border-transparent'
+                                    }`}
+                                  >
+                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                                      isSelected 
+                                        ? 'bg-emerald-600 border-emerald-600' 
+                                        : 'border-slate-300 bg-white'
+                                    }`}>
+                                      {isSelected && (
+                                        <i data-lucide="check" className="w-3 h-3 text-white"></i>
+                                      )}
+                                    </div>
+                                    <span className={`text-sm font-bold flex-1 ${
+                                      isSelected ? 'text-emerald-900' : 'text-slate-700'
+                                    }`}>{v}</span>
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => toggleVariety(v)}
+                                      className="sr-only"
+                                    />
+                                  </label>
+                                );
+                              })}
+                              {filtered.length === 0 && (
+                                <div className="text-sm text-slate-400 py-4 text-center font-medium">No varieties found</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Area</label>
-                    <div className="relative">
-                      <input 
-                        type="number" 
-                        placeholder="0.0"
-                        className="w-full p-3 bg-white border border-slate-100 rounded-[15px] font-black text-slate-900 pr-12 outline-none"
-                        onChange={(e) => setFormData({ ...formData, farmDetails: { ...formData.farmDetails!, size: parseFloat(e.target.value) } })}
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">Acres</div>
+                {selectedVarieties.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{i18n.translate('onboarding.selectedVarieties')}:</div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedVarieties.map((variety) => (
+                        <div
+                          key={variety}
+                          className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center space-x-2"
+                        >
+                          <span>{variety}</span>
+                          <button
+                            onClick={() => toggleVariety(variety)}
+                            className="hover:text-emerald-900"
+                          >
+                            <i data-lucide="x" className="w-3 h-3"></i>
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
+                )}
+              </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Soil Type</label>
-                    <select 
-                      className="w-full p-3 bg-white border border-slate-100 rounded-[15px] font-bold text-slate-700 outline-none"
-                      onChange={(e) => setFormData({ ...formData, farmDetails: { ...formData.farmDetails!, soilType: e.target.value as SoilType } })}
-                    >
-                      <option value="Black">Black Cotton</option>
-                      <option value="Loamy">Loamy</option>
-                      <option value="Sandy">Sandy</option>
-                    </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Area</label>        
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="0.0"
+                      className="w-full p-3 bg-white border border-slate-100 rounded-[15px] font-black text-slate-900 pr-12 outline-none"
+                      onChange={(e) => setFormData({ ...formData, farmDetails: { ...formData.farmDetails!, size: parseFloat(e.target.value) } })}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">Acres</div>
                   </div>
                 </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Soil Type</label>   
+                  <select
+                    className="w-full p-3 bg-white border border-slate-100 rounded-[15px] font-bold text-slate-700 outline-none"
+                    onChange={(e) => setFormData({ ...formData, farmDetails: { ...formData.farmDetails!, soilType: e.target.value as SoilType } })}
+                  >
+                    <option value="Black">Black Cotton</option>
+                    <option value="Loamy">Loamy</option>
+                    <option value="Sandy">Sandy</option>
+                  </select>
+                </div>
               </div>
-            )}
+            </div>
 
             <div className="flex flex-col space-y-3 pt-4">
               <button 
                 onClick={handleNext}
-                disabled={!selectedCropId || !formData.farmDetails?.size}
+                disabled={!formData.farmDetails?.size || selectedVarieties.length === 0}
                 className="w-full py-4 bg-emerald-600 text-white rounded-[15px] font-bold text-base shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all disabled:bg-slate-200"
               >
-                Complete Profile
+                {i18n.translate('onboarding.complete')}
               </button>
-              <button onClick={handleBack} className="w-full py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">Go Back</button>
+              <button onClick={handleBack} className="w-full py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">{i18n.translate('common.back')}</button>
             </div>
           </div>
         );
@@ -368,7 +542,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-0.5">
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Primary Focus</div>
-                  <div className="text-sm font-black text-slate-800">{selectedCropId} ({selectedVariety})</div>
+                  <div className="text-sm font-black text-slate-800">{selectedCropId}</div>
+                </div>
+                <div className="space-y-0.5">
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Selected Varieties</div>      
+                  <div className="text-sm font-black text-slate-800">{selectedVarieties.length} varieties</div>
                 </div>
                 <div className="space-y-0.5">
                   <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Plot Scale</div>
@@ -391,7 +569,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             </div>
 
             <div className="flex flex-col space-y-3 pt-6">
-              <button 
+              <button
                 onClick={finalize}
                 className="w-full py-4 bg-slate-900 text-white rounded-[15px] font-bold text-lg shadow-xl hover:bg-black active:scale-[0.98] transition-all"
               >
@@ -412,8 +590,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       <div className="w-full max-w-md bg-white rounded-[15px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden relative">
         {/* Progress bar refined */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-50">
-          <div 
-            className="h-full bg-emerald-500 transition-all duration-700 ease-out" 
+          <div
+            className="h-full bg-emerald-500 transition-all duration-700 ease-out"
             style={{ width: `${(step / 5) * 100}%` }}
           ></div>
         </div>
@@ -421,7 +599,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         <div className="p-10">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 bg-emerald-600 rounded-[15px] flex items-center justify-center text-white shadow-sm">
+              <div className="w-8 h-8 bg-emerald-600 rounded-[15px] flex items-center justify-center text-white shadow-sm">     
                   <i data-lucide="sprout" className="w-5 h-5"></i>
               </div>
               <span className="font-black text-lg text-emerald-950 tracking-tighter">AgriSmart AI</span>

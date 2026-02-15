@@ -4,12 +4,13 @@ import { ImpactApi } from '../api/impact/service';
 import { CropsApi } from '../api/crops/service';
 import { WeatherApi } from '../api/weather/service';
 import { WeatherImpactAssessment, DamageReport, Crop } from '../types';
+import { i18n } from '../utils/i18n';
 
 const ImpactAssessment: React.FC = () => {
   const [assessments, setAssessments] = useState<WeatherImpactAssessment[]>([]);
   const [reports, setReports] = useState<DamageReport[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'assessments' | 'reports'>('assessments');
+  const [activeTab, setActiveTab] = useState<'assessments' | 'reports' | 'market'>('market');
   const [showReportForm, setShowReportForm] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,12 @@ const ImpactAssessment: React.FC = () => {
         </div>
         <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-sm">
           <button 
+            onClick={() => setActiveTab('market')}
+            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'market' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500'}`}
+          >
+            Market Impact
+          </button>
+          <button 
             onClick={() => setActiveTab('assessments')}
             className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'assessments' ? 'bg-white text-red-700 shadow-sm' : 'text-slate-500'}`}
           >
@@ -83,7 +90,77 @@ const ImpactAssessment: React.FC = () => {
         </div>
       </header>
 
-      {activeTab === 'assessments' ? (
+      {activeTab === 'market' ? (
+        <div className="space-y-8 animate-fade-in">
+          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-[48px] p-12 border border-emerald-200 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="relative z-10">
+              <div className="inline-flex px-4 py-2 bg-emerald-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest mb-6">
+                <i data-lucide="trending-up" className="w-3 h-3 mr-2"></i>
+                Platform Impact Metrics
+              </div>
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-8">
+                {i18n.translate('impact.title')}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-8 rounded-[32px] border border-emerald-200 shadow-lg hover:shadow-xl transition-all group">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="indian-rupee" className="w-8 h-8"></i>
+                  </div>
+                  <div className="text-5xl font-black text-emerald-600 mb-3">40%</div>
+                  <div className="text-lg font-bold text-slate-900 mb-2">{i18n.translate('impact.betterPrice')}</div>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    Farmers using AgriSmart achieve significantly better price realization through direct market connections and data-driven insights.
+                  </p>
+                </div>
+                
+                <div className="bg-white p-8 rounded-[32px] border border-emerald-200 shadow-lg hover:shadow-xl transition-all group">
+                  <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="users-x" className="w-8 h-8"></i>
+                  </div>
+                  <div className="text-5xl font-black text-blue-600 mb-3">70%</div>
+                  <div className="text-lg font-bold text-slate-900 mb-2">{i18n.translate('impact.reductionMiddlemen')}</div>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    Reduced dependency on middlemen through direct buyer connections, transparent pricing, and digital market access.
+                  </p>
+                </div>
+                
+                <div className="bg-white p-8 rounded-[32px] border border-emerald-200 shadow-lg hover:shadow-xl transition-all group">
+                  <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="eye" className="w-8 h-8"></i>
+                  </div>
+                  <div className="text-5xl font-black text-amber-600 mb-3">100%</div>
+                  <div className="text-lg font-bold text-slate-900 mb-2">{i18n.translate('impact.marketTransparency')}</div>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    Complete market transparency with real-time prices, historical trends, and predictive analytics for informed decision-making.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-10 pt-8 border-t border-emerald-200">
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-3 px-5 py-3 bg-white rounded-xl border border-emerald-100">
+                    <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
+                    <span className="text-sm font-bold text-slate-700">Direct Buyer Network</span>
+                  </div>
+                  <div className="flex items-center space-x-3 px-5 py-3 bg-white rounded-xl border border-emerald-100">
+                    <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
+                    <span className="text-sm font-bold text-slate-700">Real-time Price Data</span>
+                  </div>
+                  <div className="flex items-center space-x-3 px-5 py-3 bg-white rounded-xl border border-emerald-100">
+                    <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
+                    <span className="text-sm font-bold text-slate-700">AI-Powered Insights</span>
+                  </div>
+                  <div className="flex items-center space-x-3 px-5 py-3 bg-white rounded-xl border border-emerald-100">
+                    <i data-lucide="check-circle-2" className="w-5 h-5 text-emerald-600"></i>
+                    <span className="text-sm font-bold text-slate-700">Market Forecasting</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === 'assessments' ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {assessments.map((item, idx) => (
             <div key={idx} className="bg-white rounded-[40px] border border-slate-200 p-10 shadow-sm space-y-8 relative overflow-hidden group hover:border-red-200 transition-all">
