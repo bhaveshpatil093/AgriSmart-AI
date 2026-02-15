@@ -160,6 +160,7 @@ Email: bhaveshpatiltech@gmail.com
 **Ajinkya Wagh** - Frontend Developer & Communications  
 GitHub: [@Ajinkyawagh4846](https://github.com/Ajinkyawagh4846)  
 Email: ajinkyawagh2005@gmail.com
+
 ---
 
 ## 📞 Contact
