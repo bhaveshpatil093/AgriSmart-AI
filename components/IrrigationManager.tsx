@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { IrrigationApi } from '../api/irrigation/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
+import { IrrigationApi } from '../client_api/irrigation/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
 import { IrrigationRecommendation, WaterUsageRecord, Crop, WeatherData } from '../types';
 
 const IrrigationManager: React.FC = () => {

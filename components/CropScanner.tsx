@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { analyzeCropImage } from '../services/geminiService';
-import { PestApi } from '../api/pest/service';
+import { PestApi } from '../client_api/pest/service';
 import { PestDetection, OutbreakZone } from '../types';
 
 const CropScanner: React.FC = () => {

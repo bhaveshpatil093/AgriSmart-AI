@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { MarketApi } from '../api/market/service';
+import { MarketApi } from '../client_api/market/service';
 import { MandiPrice, AuctionFeed, UserPriceReport } from '../types';
 
 const MarketHub: React.FC = () => {

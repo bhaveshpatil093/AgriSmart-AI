@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts';
-import { QAApi } from '../api/qa/service';
+import { QAApi } from '../client_api/qa/service';
 import { PipelineStage, TestCoverage, UATFeedback, LoadTestMetric } from '../types';
 
 const QADashboard: React.FC = () => {

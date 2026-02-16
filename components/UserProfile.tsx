@@ -1,8 +1,8 @@
 // import React, { useState, useEffect } from 'react';
 // import { User, AppView } from '../types';
-// import { AuthApi } from '../api/auth/service';
-// import { UserApi } from '../api/user/service';
-// import { SupabaseAuth } from '../api/auth/supabaseAuth';
+// import { AuthApi } from '../client_api/auth/service';
+// import { UserApi } from '../client_api/user/service';
+// import { SupabaseAuth } from '../client_api/auth/supabaseAuth';
 // import { i18n } from '../utils/i18n';
 
 // interface UserProfileProps {
@@ -243,9 +243,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, AppView } from '../types';
-import { AuthApi } from '../api/auth/service';
-import { UserApi } from '../api/user/service';
-import { SupabaseAuth } from '../api/auth/supabaseAuth';
+import { AuthApi } from '../client_api/auth/service';
+import { UserApi } from '../client_api/user/service';
+import { SupabaseAuth } from '../client_api/auth/supabaseAuth';
 import { i18n } from '../utils/i18n';
 
 interface UserProfileProps {

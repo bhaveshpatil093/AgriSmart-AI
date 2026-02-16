@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Line } from 'recharts';
 import { getClimateImpactProjection } from '../services/geminiService';
-import { HistoricalApi } from '../api/historical/service';
+import { HistoricalApi } from '../client_api/historical/service';
 import { ClimateAnalysis } from '../types';
 import { formatHistoricalTrends, calculateSMA } from '../utils/analytics';
 

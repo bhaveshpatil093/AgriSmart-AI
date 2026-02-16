@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // Fix: Import User from ../types instead of ../api/auth/service as it is not available for export from the service
 import { User } from '../types';
-import { AuthApi } from '../api/auth/service';
+import { AuthApi } from '../client_api/auth/service';
 import { i18n } from '../utils/i18n';
 
 interface AuthContextType {

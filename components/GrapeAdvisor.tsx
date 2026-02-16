@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { GrapeApi } from '../api/grapes/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
-import { MarketApi } from '../api/market/service';
+import { GrapeApi } from '../client_api/grapes/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
+import { MarketApi } from '../client_api/market/service';
 import { GrapeAdvisory, Crop, WeatherData, MarketPrice } from '../types';
 
 const GrapeAdvisor: React.FC = () => {

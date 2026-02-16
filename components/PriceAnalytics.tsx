@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, BarChart, Cell } from 'recharts';
-import { MarketApi } from '../api/market/service';
+import { MarketApi } from '../client_api/market/service';
 import { PriceHistoryPoint, YoYPricePoint, MarketArbitrage } from '../types';
 
 const PriceAnalytics: React.FC = () => {

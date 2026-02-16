@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CropCalendar as CropCalendarType, CalendarTask, CropStage, Crop } from '../types';
-import { CropCalendarApi } from '../api/crops/calendarService';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
+import { CropCalendarApi } from '../client_api/crops/calendarService';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
 import { useAuth } from '../contexts/AuthContext';
 import { i18n, Language } from '../utils/i18n';
 

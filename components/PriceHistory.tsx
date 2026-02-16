@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { PriceHistoryApi } from '../api/market/priceHistoryService';
+import { PriceHistoryApi } from '../client_api/market/priceHistoryService';
 import { HistoricalPriceData, PriceHistoryFilters } from '../types';
 import { i18n } from '../utils/i18n';
 

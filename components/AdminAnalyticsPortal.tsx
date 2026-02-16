@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend, LineChart, Line } from 'recharts';
-import { AnalyticsApi } from '../api/analytics/service';
+import { AnalyticsApi } from '../client_api/analytics/service';
 import { BusinessMetrics, FeatureUsage, ImpactMetrics, PerformanceStats } from '../types';
 
 const AdminAnalyticsPortal: React.FC = () => {

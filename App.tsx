@@ -51,8 +51,8 @@ import AdminAnalyticsPortal from './components/AdminAnalyticsPortal';
 import QADashboard from './components/QADashboard';
 
 import { AppView, User, UserRole } from './types';
-import { NotificationApi } from './api/notifications/service';
-import { AnalyticsApi } from './api/analytics/service';
+import { NotificationApi } from './client_api/notifications/service';
+import { AnalyticsApi } from './client_api/analytics/service';
 import { i18n } from './utils/i18n';
 
 const AppContent: React.FC = () => {

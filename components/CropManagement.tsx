@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CropsApi } from '../api/crops/service';
+import { CropsApi } from '../client_api/crops/service';
 import { Crop, Activity, CostRecord } from '../types';
 import { calculateCropStage } from '../utils/agronomy';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, Legend } from 'recharts';
-import { HarvestApi } from '../api/harvest/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
+import { HarvestApi } from '../client_api/harvest/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
 import { HarvestAdvisory, Crop, HarvestScenario } from '../types';
 
 const HarvestOptimizer: React.FC = () => {

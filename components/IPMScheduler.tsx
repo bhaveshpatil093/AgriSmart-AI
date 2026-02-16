@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { IPMApi } from '../api/ipm/service';
-import { CropsApi } from '../api/crops/service';
+import { IPMApi } from '../client_api/ipm/service';
+import { CropsApi } from '../client_api/crops/service';
 import { IPMSummary, Crop, IPMTask, SprayLogEntry, IPMCategory } from '../types';
 
 const IPMScheduler: React.FC = () => {

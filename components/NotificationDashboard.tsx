@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
-import { NotificationApi } from '../api/notifications/service';
+import { NotificationApi } from '../client_api/notifications/service';
 import { NotificationAnalytics } from '../types';
 
 const NotificationDashboard: React.FC = () => {

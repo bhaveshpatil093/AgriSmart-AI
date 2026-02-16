@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { MarketApi } from '../api/market/service';
-import { CropsApi } from '../api/crops/service';
-import { HealthApi } from '../api/health/service';
+import { MarketApi } from '../client_api/market/service';
+import { CropsApi } from '../client_api/crops/service';
+import { HealthApi } from '../client_api/health/service';
 
-import { WeatherApi } from '../api/weather/service';
-import { IrrigationApi } from '../api/irrigation/service';
+import { WeatherApi } from '../client_api/weather/service';
+import { IrrigationApi } from '../client_api/irrigation/service';
 import { Crop, MarketPrice, Advisory, WeatherData, IrrigationRecommendation, WeatherAlert, AppView } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { i18n, Language } from '../utils/i18n';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TomatoApi } from '../api/tomatoes/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
-import { MarketApi } from '../api/market/service';
+import { TomatoApi } from '../client_api/tomatoes/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
+import { MarketApi } from '../client_api/market/service';
 import { TomatoAdvisory, Crop, WeatherData, MarketPrice } from '../types';
 
 const TomatoAdvisor: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WeatherData, WeatherAlert, AgriculturalMetrics } from '../types';
-import { WeatherApi } from '../api/weather/service';
+import { WeatherApi } from '../client_api/weather/service';
 import { useAuth } from '../contexts/AuthContext';
 import { i18n } from '../utils/i18n';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';

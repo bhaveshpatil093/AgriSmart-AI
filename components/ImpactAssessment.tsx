@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { ImpactApi } from '../api/impact/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
+import { ImpactApi } from '../client_api/impact/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
 import { WeatherImpactAssessment, DamageReport, Crop } from '../types';
 import { i18n } from '../utils/i18n';
 

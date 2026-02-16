@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { OnionApi } from '../api/onions/service';
-import { CropsApi } from '../api/crops/service';
-import { WeatherApi } from '../api/weather/service';
-import { MarketApi } from '../api/market/service';
+import { OnionApi } from '../client_api/onions/service';
+import { CropsApi } from '../client_api/crops/service';
+import { WeatherApi } from '../client_api/weather/service';
+import { MarketApi } from '../client_api/market/service';
 import { OnionAdvisory, Crop, WeatherData, MarketPrice } from '../types';
 
 const OnionAdvisor: React.FC = () => {

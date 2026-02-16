@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CommunityApi } from '../api/community/service';
+import { CommunityApi } from '../client_api/community/service';
 import { CommunityPost, CommunityReply, ForumCategory } from '../types';
 
 type FeedType = 'latest' | 'trending' | 'unanswered' | 'village' | 'my-posts' | 'following' | 'expert';

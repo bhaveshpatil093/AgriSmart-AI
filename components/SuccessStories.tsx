@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { StoriesApi } from '../api/stories/service';
+import { StoriesApi } from '../client_api/stories/service';
 import { SuccessStory, StoryCategory } from '../types';
 
 const SuccessStories: React.FC = () => {

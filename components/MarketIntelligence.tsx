@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, Cell } from 'recharts';
-import { IntelligenceApi } from '../api/market/intelligenceService';
-import { MarketApi } from '../api/market/service';
+import { IntelligenceApi } from '../client_api/market/intelligenceService';
+import { MarketApi } from '../client_api/market/service';
 import { MarketOpportunity, MarketNews, SaleRecord, SellRecommendation, PriceHistoryPoint, MarketAlert, Market } from '../types';
 
 const MarketIntelligence: React.FC = () => {

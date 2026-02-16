@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { FertilizerApi } from '../api/fertilizer/service';
-import { CropsApi } from '../api/crops/service';
+import { FertilizerApi } from '../client_api/fertilizer/service';
+import { CropsApi } from '../client_api/crops/service';
 import { NutrientAdvisory, Crop } from '../types';
 
 const NutrientPlanner: React.FC = () => {

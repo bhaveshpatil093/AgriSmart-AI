@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NotificationApi } from '../api/notifications/service';
+import { NotificationApi } from '../client_api/notifications/service';
 import { Notification } from '../types';
 
 interface NotificationCenterProps {

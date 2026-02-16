@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SupabaseAuth, SignUpData } from '../../api/auth/supabaseAuth';
+import { SupabaseAuth, SignUpData } from '../../client_api/auth/supabaseAuth';
 import { useAuth } from '../../contexts/AuthContext';
 import { i18n } from '../../utils/i18n';
 // Crop varieties data

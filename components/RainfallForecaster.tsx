@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { PredictionApi } from '../api/prediction/service';
+import { PredictionApi } from '../client_api/prediction/service';
 import { PredictionOutcome } from '../types';
 
 const RainfallForecaster: React.FC = () => {

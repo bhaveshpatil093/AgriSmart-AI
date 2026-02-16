@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExpertApi } from '../api/experts/service';
+import { ExpertApi } from '../client_api/experts/service';
 import { ExpertProfile, ExpertQuestion, ConsultationSession } from '../types';
 
 const ExpertHub: React.FC = () => {

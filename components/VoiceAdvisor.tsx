@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { User, VoiceConversation } from '../types';
-import { AdvisoryApi } from '../api/advisory/service';
+import { AdvisoryApi } from '../client_api/advisory/service';
 
 interface VoiceAdvisorProps {
     user: User;

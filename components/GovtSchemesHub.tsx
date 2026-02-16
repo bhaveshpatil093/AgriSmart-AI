@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GovtSchemesApi } from '../api/schemes/service';
+import { GovtSchemesApi } from '../client_api/schemes/service';
 import { GovtScheme, SchemeApplication, User } from '../types';
 
 interface Props {

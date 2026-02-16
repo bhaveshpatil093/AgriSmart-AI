@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { JobApi } from '../api/jobs/service';
+import { JobApi } from '../client_api/jobs/service';
 import { BackgroundJob, SystemEvent, JobStatus } from '../types';
 
 const SystemJobsDashboard: React.FC = () => {

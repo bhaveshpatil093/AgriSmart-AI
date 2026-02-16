@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, Cell } from 'recharts';
-import { PricePredictionApi } from '../api/market/predictionService';
+import { PricePredictionApi } from '../client_api/market/predictionService';
 import { PricePredictionOutcome } from '../types';
 
 const PriceForecaster: React.FC = () => {

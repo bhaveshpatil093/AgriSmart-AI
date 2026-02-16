@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { User } from '../types';
-import { UserApi } from '../api/user/service';
+import { UserApi } from '../client_api/user/service';
 
 const NotificationPreferences: React.FC = () => {
   const { user, setUser } = useAuth();
