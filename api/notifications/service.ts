@@ -49,6 +49,18 @@ export const NotificationApi = {
     return api.wrapSuccess(undefined);
   },
 
+  create: async (notification: Omit<Notification, 'id' | 'createdAt' | 'isRead'>): Promise<ApiResponse<Notification>> => {
+    const newNotification: Notification = {
+      ...notification,
+      id: 'n' + Math.random().toString(36).substr(2, 9),
+      isRead: false,
+      createdAt: new Date().toISOString()
+    };
+    notificationHistory.push(newNotification);
+    globalAnalytics.sent++;
+    return api.wrapSuccess(newNotification);
+  },
+
   getAnalytics: async (): Promise<ApiResponse<NotificationAnalytics>> => {
     return api.wrapSuccess(globalAnalytics);
   },

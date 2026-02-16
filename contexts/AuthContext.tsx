@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // Fix: Import User from ../types instead of ../api/auth/service as it is not available for export from the service
 import { User } from '../types';
 import { AuthApi } from '../api/auth/service';
+import { i18n } from '../utils/i18n';
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +20,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initAuth = async () => {
+      console.log('[AuthContext] init: checking localStorage for agri_smart_user');
+      // First check for saved user in localStorage
+      const savedUser = localStorage.getItem('agri_smart_user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          console.log('[AuthContext] init: found saved user, setting user', parsed);
+          setUser(parsed);
+          // Initialize language from user preference
+          if (parsed.language) {
+            i18n.setLanguage(parsed.language);
+          }
+          setIsLoading(false);
+          return;
+        } catch (err) {
+          console.error('[AuthContext] error parsing saved user', err);
+        }
+      }
+      
+      // Fallback to token-based auth if no saved user
       const token = localStorage.getItem('agri_smart_token');
       if (token) {
         // In a real app, verify token with backend
@@ -30,7 +51,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           language: 'mr',
           role: 'FARMER' as any,
           location: { village: 'Pimpalgaon', ward: 'West' },
-          farmDetails: { crops: ['Grape', 'Onion'], size: 4.5, irrigation: 'drip', soilType: 'Black' },
+          farmDetails: { 
+            crops: ['Grape', 'Onion'], 
+            cropVarieties: ['Thompson', 'Crimson', 'Puna Fursungi', 'Panchganga'],
+            size: 4.5, 
+            irrigation: 'drip', 
+            soilType: 'Black' 
+          },
           // Fix: Adding missing quietHours and categorySettings to preferences
           preferences: { 
             notifications: true, 
@@ -43,6 +70,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           createdAt: new Date().toISOString()
         };
         setUser(mockUser);
+        // Initialize language from user preference
+        if (mockUser.language) {
+          i18n.setLanguage(mockUser.language);
+        }
       }
       setIsLoading(false);
     };
@@ -51,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('agri_smart_token');
+    localStorage.removeItem('agri_smart_user');
     setUser(null);
     window.location.reload();
   };

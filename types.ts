@@ -30,7 +30,12 @@ export enum AppView {
   NOTIFICATION_DASHBOARD = 'NOTIFICATION_DASHBOARD',
   SYSTEM_JOBS = 'SYSTEM_JOBS',
   ADMIN_ANALYTICS = 'ADMIN_ANALYTICS',
-  QA_DASHBOARD = 'QA_DASHBOARD'
+  QA_DASHBOARD = 'QA_DASHBOARD',
+  PRICE_HISTORY = 'PRICE_HISTORY',
+  LOGIN = 'LOGIN',
+  SIGNUP = 'SIGNUP',
+  ENHANCED_WEATHER = 'ENHANCED_WEATHER',
+  CROP_CALENDAR = 'CROP_CALENDAR'
 }
 
 export interface PipelineStage {
@@ -471,6 +476,7 @@ export interface User {
   userId: string;
   name: string;
   phone: string;
+  email?: string;
   language: 'en' | 'hi' | 'mr';
   role: UserRole;
   location: {
@@ -481,6 +487,7 @@ export interface User {
   };
   farmDetails: {
     crops: string[];
+    cropVarieties?: string[]; // Selected crop varieties
     size: number;
     irrigation: 'drip' | 'sprinkler' | 'flood';
     soilType: SoilType;
@@ -511,6 +518,23 @@ export interface User {
     units: 'metric' | 'imperial';
   };
   createdAt: string;
+}
+
+export interface HistoricalPriceData {
+  date: string;
+  cropType: string;
+  marketLocation: string;
+  price: number;
+  minPrice?: number;
+  maxPrice?: number;
+  volume?: number;
+}
+
+export interface PriceHistoryFilters {
+  cropType: string;
+  marketLocation: string;
+  startDate: string;
+  endDate: string;
 }
 
 export interface PriceHistoryPoint {
@@ -588,14 +612,21 @@ export interface PersonalizedAdvisory {
 }
 
 export type AlertSeverity = 'critical' | 'warning' | 'advisory';
+export type WeatherAlertSeverity = 'green' | 'yellow' | 'orange' | 'red';
+export type WeatherAlertType = 'heavy_rain' | 'drought' | 'frost' | 'heatwave' | 'strong_wind' | 'favorable' | 'spraying_conditions' | 'hail';
+
+export type WeatherAlertSeverity = 'green' | 'yellow' | 'orange' | 'red';
+export type WeatherAlertType = 'heavy_rain' | 'drought' | 'frost' | 'heatwave' | 'strong_wind' | 'favorable' | 'spraying_conditions' | 'hail';
 
 export interface WeatherAlert {
   id: string;
-  type: 'hail' | 'frost' | 'heatwave' | 'heavy_rain' | 'strong_wind' | 'favorable';
-  severity: AlertSeverity;
+  type: WeatherAlertType;
+  severity: WeatherAlertSeverity;
   message: string;
   startTime: string;
   endTime: string;
+  priority?: number;
+  actionable?: string; // e.g., "Delay irrigation", "Good day for spraying"
 }
 
 export interface Notification {
@@ -681,6 +712,9 @@ export interface HourlyForecast {
   rainfall: number;
   humidity: number;
   condition: string;
+  windSpeed?: number;
+  uvIndex?: number;
+  soilMoisture?: number;
 }
 
 export interface RainfallPrediction {
@@ -720,7 +754,23 @@ export interface WeatherData {
     date: string;
     temp: number;
     condition: string;
+    minTemp?: number;
+    maxTemp?: number;
+    rainfall?: number;
+    windSpeed?: number;
   }[];
+  agriculturalMetrics?: AgriculturalMetrics;
+  historicalComparison?: {
+    samePeriodLastYear: {
+      avgTemp: number;
+      totalRainfall: number;
+      extremeEvents: number;
+    };
+    deviation: {
+      temp: number;
+      rainfall: number;
+    };
+  };
 }
 
 export interface AIWeatherAdvisory {
@@ -735,6 +785,67 @@ export interface HistoricalYearData {
   totalRainfall: number;
   extremeEvents: number;
   monthlyRainfall: number[];
+}
+
+// Crop Calendar Types
+export type CropStage = 'seedling' | 'vegetative' | 'flowering' | 'fruiting' | 'harvesting' | 'post_harvest';
+export type TaskType = 'irrigation' | 'fertilizer' | 'pest_control' | 'pruning' | 'training' | 'harvest' | 'other';
+export type TaskUrgency = 'low' | 'medium' | 'high' | 'critical';
+
+export interface CropStageInfo {
+  stage: CropStage;
+  name: string;
+  nameMr: string;
+  nameHi: string;
+  duration: number; // days
+  description: string;
+  descriptionMr: string;
+  descriptionHi: string;
+  benefits: string[];
+  benefitsMr: string[];
+  benefitsHi: string[];
+  icon: string;
+  color: string;
+}
+
+export interface CalendarTask {
+  id: string;
+  cropId: string;
+  cropVariety: string;
+  stage: CropStage;
+  taskType: TaskType;
+  title: string;
+  titleMr?: string;
+  titleHi?: string;
+  description: string;
+  descriptionMr?: string;
+  descriptionHi?: string;
+  scheduledDate: string;
+  dueDate: string;
+  urgency: TaskUrgency;
+  isCompleted: boolean;
+  completedDate?: string;
+  notes?: string;
+  recommendations: string[];
+  recommendationsMr?: string[];
+  recommendationsHi?: string[];
+  weatherDependent: boolean;
+  weatherCondition?: string; // e.g., "No rain for 24h", "Wind speed < 15 km/h"
+  icon: string;
+  color: string;
+}
+
+export interface CropCalendar {
+  cropId: string;
+  cropType: string;
+  cropVariety: string;
+  sowingDate: string;
+  currentStage: CropStage;
+  stages: CropStageInfo[];
+  tasks: CalendarTask[];
+  expectedHarvestDate: string;
+  progress: number; // 0-100%
+  lastUpdated: string;
 }
 
 export interface ClimateAnalysis {

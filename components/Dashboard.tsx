@@ -6,8 +6,9 @@ import { HealthApi } from '../api/health/service';
 
 import { WeatherApi } from '../api/weather/service';
 import { IrrigationApi } from '../api/irrigation/service';
-import { Crop, MarketPrice, Advisory, WeatherData, IrrigationRecommendation, WeatherAlert } from '../types';
+import { Crop, MarketPrice, Advisory, WeatherData, IrrigationRecommendation, WeatherAlert, AppView } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { i18n, Language } from '../utils/i18n';
 
 interface Task {
   id: string;
@@ -17,8 +18,26 @@ interface Task {
   priority: 'high' | 'medium' | 'low';
 }
 
-const Dashboard: React.FC = () => {
-  const { user } = useAuth();
+interface DashboardProps {
+  setView?: (view: AppView) => void;
+  user?: any | null;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ setView, user: propUser }) => {
+  const { user: ctxUser } = useAuth();
+  const user = propUser ?? ctxUser;
+  
+  useEffect(() => {
+    console.log('[Dashboard] mounted with user:', user);
+    if (!user) {
+      console.warn('[Dashboard] No user provided, checking localStorage...');
+      const savedUser = localStorage.getItem('agri_smart_user');
+      if (savedUser) {
+        console.log('[Dashboard] Found user in localStorage:', JSON.parse(savedUser));
+      }
+    }
+  }, [user]);
+  const [currentLang, setCurrentLang] = useState<Language>(i18n.getLanguage());
   const [marketPrices, setMarketPrices] = useState<MarketPrice[]>([]);
   const [crops, setCrops] = useState<Crop[]>([]);
   const [advisories, setAdvisories] = useState<Advisory[]>([]);
@@ -40,6 +59,14 @@ const Dashboard: React.FC = () => {
   ]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [showWeatherModal, setShowWeatherModal] = useState(false);
+
+  useEffect(() => {
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLang(e.detail);
+    };
+    window.addEventListener('languageChanged', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -109,9 +136,9 @@ const Dashboard: React.FC = () => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return i18n.translate('dashboard.goodMorning');
+    if (hour < 17) return i18n.translate('dashboard.goodAfternoon');
+    return i18n.translate('dashboard.goodEvening');
   };
 
   const toggleTask = (id: string) => {
@@ -185,7 +212,11 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-4 space-y-8">
           {/* Enhanced Weather Widget */}
           <div
-            onClick={() => setShowWeatherModal(true)}
+            onClick={() => {
+              if (setView) {
+                setView(AppView.ENHANCED_WEATHER);
+              }
+            }}
             className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm group hover:border-emerald-300 transition-all cursor-pointer relative overflow-hidden"
           >
             <div className="flex justify-between items-start mb-6">
@@ -264,7 +295,7 @@ const Dashboard: React.FC = () => {
           {/* Task Manager */}
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6 flex flex-col min-h-[400px]">
             <div className="flex justify-between items-center">
-              <h2 className="text-lg font-bold text-slate-800 tracking-tight">Focus Tasks</h2>
+              <h2 className="text-lg font-bold text-slate-800 tracking-tight">{i18n.translate('dashboard.tasks')}</h2>
               <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md text-[10px] font-bold uppercase tracking-wider">
                 {tasks.filter(t => !t.isCompleted).length} Pending
               </span>
@@ -323,7 +354,7 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-3 space-y-6">
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col min-h-[400px]">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold text-slate-800 tracking-tight">Market Pulse</h3>
+              <h3 className="text-lg font-bold text-slate-800 tracking-tight">{i18n.translate('dashboard.marketPulse')}</h3>
               <i data-lucide="bar-chart-2" className="w-4 h-4 text-slate-400"></i>
             </div>
             <div className="space-y-3 flex-1">
@@ -352,7 +383,7 @@ const Dashboard: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
             <h3 className="text-lg font-bold tracking-tight flex items-center">
               <i data-lucide="database" className="w-4 h-4 mr-2 text-emerald-400"></i>
-              Crop Inventory
+              {i18n.translate('dashboard.cropInventory')}
             </h3>
             <div className="space-y-6">
               {crops.map((crop) => (
@@ -367,6 +398,23 @@ const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
+            
+            {/* Display Selected Crop Varieties */}
+            {user?.farmDetails?.cropVarieties && user.farmDetails.cropVarieties.length > 0 && (
+              <div className="pt-6 border-t border-white/10 space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-tight text-slate-400">Selected Varieties</h4>
+                <div className="flex flex-wrap gap-2">
+                  {user.farmDetails.cropVarieties.map((variety, idx) => (
+                    <div
+                      key={idx}
+                      className="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 rounded-lg text-[10px] font-bold border border-emerald-500/30"
+                    >
+                      {variety}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
