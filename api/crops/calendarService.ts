@@ -214,7 +214,7 @@ const generateTasksForStage = (
   weatherData?: any
 ): CalendarTask[] => {
   const tasks: CalendarTask[] = [];
-  const baseTasks: Record<string, Record<CropStage, any[]>> = {
+  const baseTasks: Record<string, Partial<Record<CropStage, any[]>>> = {
     'Tomato': {
       'seedling': [
         { type: 'irrigation', title: 'Light watering every 2-3 days', urgency: 'medium', day: 1 },
@@ -286,17 +286,17 @@ const generateTasksForStage = (
   };
 
   const cropTasks = baseTasks[cropType]?.[stage.stage] || [];
-  
+
   cropTasks.forEach((taskDef: any, idx: number) => {
     const taskDate = new Date(startDate);
     taskDate.setDate(startDate.getDate() + taskDef.day);
-    
+
     // Adjust based on weather if weather-dependent
     let adjustedDate = taskDate;
     if (weatherData && taskDef.type === 'pest_control') {
       // Delay spraying if rain predicted
-      const rainPredicted = weatherData.forecast7Day?.some((d: any) => 
-        new Date(d.date) >= taskDate && new Date(d.date) <= new Date(taskDate.getTime() + 2 * 24 * 60 * 60 * 1000) && 
+      const rainPredicted = weatherData.forecast7Day?.some((d: any) =>
+        new Date(d.date) >= taskDate && new Date(d.date) <= new Date(taskDate.getTime() + 2 * 24 * 60 * 60 * 1000) &&
         (d.rainfall || 0) > 5
       );
       if (rainPredicted) {
@@ -334,16 +334,16 @@ const generateTasksForStage = (
       ],
       weatherDependent: taskDef.type === 'pest_control' || taskDef.type === 'irrigation',
       weatherCondition: taskDef.type === 'pest_control' ? 'No rain for 24h, Wind speed < 15 km/h' : undefined,
-      icon: taskDef.type === 'irrigation' ? 'droplet' : 
-            taskDef.type === 'fertilizer' ? 'flask-conical' :
-            taskDef.type === 'pest_control' ? 'shield-check' :
+      icon: taskDef.type === 'irrigation' ? 'droplet' :
+        taskDef.type === 'fertilizer' ? 'flask-conical' :
+          taskDef.type === 'pest_control' ? 'shield-check' :
             taskDef.type === 'pruning' ? 'scissors' :
-            taskDef.type === 'harvest' ? 'scissors' : 'check-circle',
+              taskDef.type === 'harvest' ? 'scissors' : 'check-circle',
       color: taskDef.type === 'irrigation' ? 'bg-blue-100 text-blue-700' :
-             taskDef.type === 'fertilizer' ? 'bg-amber-100 text-amber-700' :
-             taskDef.type === 'pest_control' ? 'bg-red-100 text-red-700' :
-             taskDef.type === 'pruning' ? 'bg-purple-100 text-purple-700' :
-             taskDef.type === 'harvest' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+        taskDef.type === 'fertilizer' ? 'bg-amber-100 text-amber-700' :
+          taskDef.type === 'pest_control' ? 'bg-red-100 text-red-700' :
+            taskDef.type === 'pruning' ? 'bg-purple-100 text-purple-700' :
+              taskDef.type === 'harvest' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
     };
     tasks.push(task);
   });
@@ -376,10 +376,10 @@ export const CropCalendarApi = {
           weatherData
         );
         allTasks.push(...stageTasks);
-        
+
         currentDate = new Date(stageStartDate);
         currentDate.setDate(stageStartDate.getDate() + stage.duration);
-        
+
         // Determine current stage
         const today = new Date();
         if (today >= stageStartDate && today <= currentDate) {

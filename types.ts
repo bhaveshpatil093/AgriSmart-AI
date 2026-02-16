@@ -467,7 +467,7 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  timestamp: string;
+  timestamp?: string;
 }
 
 export type SoilType = 'Black' | 'Sandy' | 'Loamy' | 'Red';
@@ -615,8 +615,7 @@ export type AlertSeverity = 'critical' | 'warning' | 'advisory';
 export type WeatherAlertSeverity = 'green' | 'yellow' | 'orange' | 'red';
 export type WeatherAlertType = 'heavy_rain' | 'drought' | 'frost' | 'heatwave' | 'strong_wind' | 'favorable' | 'spraying_conditions' | 'hail';
 
-export type WeatherAlertSeverity = 'green' | 'yellow' | 'orange' | 'red';
-export type WeatherAlertType = 'heavy_rain' | 'drought' | 'frost' | 'heatwave' | 'strong_wind' | 'favorable' | 'spraying_conditions' | 'hail';
+
 
 export interface WeatherAlert {
   id: string;
@@ -737,6 +736,15 @@ export interface PredictionOutcome {
     lastRetrained: string;
   };
   explanation: string;
+}
+
+export interface AgriculturalMetrics {
+  soilMoistureProbability: number;
+  uvIndex: number;
+  fieldOperationSuitability: string;
+  sprayingRecommendation: string;
+  windSpeedForSpraying: string;
+  irrigationRecommendation: string;
 }
 
 export interface WeatherData {

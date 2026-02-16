@@ -14,7 +14,7 @@ export interface SupabaseClient {
     signInWithPassword: (credentials: { email: string; password: string }) => Promise<any>;
     // signInWithOAuth removed - Google OAuth not supported
     signInWithOtp: (options: { phone?: string; email?: string }) => Promise<any>;
-    signOut: () => Promise<void>;
+    signOut: () => Promise<{ error: any }>;
     resetPasswordForEmail: (email: string, options?: any) => Promise<any>;
     getSession: () => Promise<any>;
     onAuthStateChange: (callback: (event: string, session: any) => void) => { data: { subscription: any }, unsubscribe: () => void };
@@ -106,7 +106,7 @@ class MockSupabaseClient implements SupabaseClient {
       // Mock subscription
       return {
         data: { subscription: null },
-        unsubscribe: () => {}
+        unsubscribe: () => { }
       };
     },
     getUser: async () => {
